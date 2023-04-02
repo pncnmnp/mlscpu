@@ -21,7 +21,7 @@ cp mlscpu /usr/local/bin/
 
 You can now run `mlscpu`
 ```bash
-[14:55][mlscpu] mlscpu
+[14:55][~] mlscpu
 Architecture: x86_64
 Byte Order: Little Endian
 CPU(s): 4
