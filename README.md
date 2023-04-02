@@ -1,7 +1,6 @@
 # mlscpu
 
-mlscpu is a tool for gathering detailed CPU information on macOS.
-
+`mlscpu` is a tool designed for collecting information about the CPU on macOS. This tool takes inspiration from [`lscpu`](https://man7.org/linux/man-pages/man1/lscpu.1.html) tool used in Linux.
 ## Motivation
 
 Although there are various commands that can retrieve this information (as mentioned in [this Stack Exchange thread](https://apple.stackexchange.com/questions/352769/does-macos-have-a-command-to-retrieve-detailed-cpu-information-like-proc-cpuinf)), there is currently no concrete tool for this purpose.
