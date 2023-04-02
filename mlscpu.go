@@ -4,13 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
 	"github.com/iancoleman/orderedmap"
 )
+
+const Cmds = `{
+    "Architecture": "uname -m",
+    "Byte Order": "sysctl -n hw.byteorder",
+    "CPU(s)": "sysctl -n hw.ncpu",
+    "On-line CPU(s)": "sysctl -n hw.activecpu",
+    "Thread(s) per core": "echo \"scale=0; $(sysctl -n machdep.cpu.thread_count) / $(sysctl -n machdep.cpu.core_count)\" | bc",
+    "Core(s) per socket": "echo \"scale=0; $(sysctl -n machdep.cpu.core_count) / $(sysctl -n hw.packages)\" | bc",
+    "Socket(s)": "sysctl -n hw.packages",
+    "Vendor ID": "sysctl -n machdep.cpu.vendor",
+    "CPU family": "sysctl -n machdep.cpu.family",
+    "CPU Model": "sysctl -n machdep.cpu.model",
+    "Model name": "sysctl -n machdep.cpu.brand_string",
+    "Stepping": "sysctl -n machdep.cpu.stepping",
+    "CPU MHz": "sysctl -n hw.cpufrequency",
+    "CPU max MHz": "sysctl -n hw.cpufrequency_max",
+    "CPU min MHz": "sysctl -n hw.cpufrequency_min",
+    "Hyper-Threading Technology": "system_profiler SPHardwareDataType | grep \"Hyper-Threading Technology\" | cut -d: -f2-",
+    "L1d cache": "sysctl -n hw.l1dcachesize",
+    "L1i cache": "sysctl -n hw.l1icachesize",
+    "L2 cache": "sysctl -n hw.l2cachesize",
+    "L3 cache": "sysctl -n hw.l3cachesize",
+    "Flags": "sysctl -n machdep.cpu.features"
+}
+`
 
 // https://stackoverflow.com/a/15323988/7543474
 // Licensed under CC BY-SA 4.0
@@ -46,18 +70,11 @@ func modify_cmd_output(cmd string, cmd_output string) string {
 	return cmd_output
 }
 
-func decode_json_file(filename string) *orderedmap.OrderedMap {
-	json_file, err := os.Open("cmds.json")
-	if err != nil {
-		log.Println("Error opening JSON file: ", err)
-		return nil
-	}
-	defer json_file.Close()
-
-	decoder := json.NewDecoder(json_file)
+func decode_json_file() *orderedmap.OrderedMap {
+	decoder := json.NewDecoder(strings.NewReader(Cmds))
 	commands := orderedmap.New()
 	decoder.UseNumber()
-	err = decoder.Decode(&commands)
+	err := decoder.Decode(&commands)
 	if err != nil {
 		log.Println("Error decoding JSON file: ", err)
 		return nil
@@ -66,7 +83,7 @@ func decode_json_file(filename string) *orderedmap.OrderedMap {
 }
 
 func main() {
-	commands := decode_json_file("cmds.json")
+	commands := decode_json_file()
 	if commands == nil {
 		return
 	}
